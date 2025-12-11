@@ -2,28 +2,32 @@ import os
 import shutil
 from app.schemas import document
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from app.services.document_service import process_document, delete_document_by_filename, UPLOAD_DIR
+from app.services.document_service import process_document, delete_document_by_filename, UPLOAD_DIR, ALLOWED_EXTENSIONS
 from app.schemas.document import DocumentUploadResponse, DocumentDeleteResponse
 
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
 
 
+def _is_allowed_file(filename: str) -> bool:
+    return any(filename.lower().endswith(ext) for ext in ALLOWED_EXTENSIONS)
+
+
 @router.post("/upload", response_model=DocumentUploadResponse)
 async def upload_document(file: UploadFile = File(...)):
     """
-    Upload a PDF document.
+    Upload a document (PDF or DOCX).
 
     The document will be:
     1. Saved to the uploads folder
-    2. Text extracted from PDF
+    2. Text extracted from document
     3. Split into chunks
     4. Each chunk saved to Pinecone for semantic search
     """
-    if not file.filename.lower().endswith(".pdf"):
+    if not _is_allowed_file(file.filename):
         raise HTTPException(
             status_code=400,
-            detail="Only PDF files are allowed"
+            detail=f"Only [{', '.join(ALLOWED_EXTENSIONS)}] files are allowed"
         )
 
     os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -64,7 +68,7 @@ async def list_documents():
         return {"documents": [], "total": 0}
 
     for f in os.listdir(UPLOAD_DIR):
-        if f.endswith(".pdf"):
+        if _is_allowed_file(f):
             path = os.path.join(UPLOAD_DIR, f)
             size = os.path.getsize(path)
 
