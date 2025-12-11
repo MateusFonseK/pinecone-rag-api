@@ -53,3 +53,23 @@ def delete_document(doc_id: str) -> bool:
     return True
 
 
+def list_ids_by_filename(filename: str) -> list[str]:
+    """
+    List all vector IDs that belong to a specific filename.
+    """
+    results = _index.list(prefix=f"{filename}_")
+    ids = []
+    for id_list in results:
+        ids.extend(id_list)
+    return ids
+
+
+def delete_by_ids(ids: list[str]) -> bool:
+    """
+    Delete multiple vectors by their IDs.
+    """
+    if ids:
+        _index.delete(ids=ids)
+    return True
+
+
