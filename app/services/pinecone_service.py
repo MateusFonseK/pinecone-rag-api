@@ -8,11 +8,6 @@ _client = Pinecone(api_key=settings.pinecone_api_key)
 _index = _client.Index(settings.pinecone_index_name)
 
 
-def get_index_stats() -> dict:
-    
-    return _index.describe_index_stats()
-
-
 def upsert_document(doc_id: str, text: str, metadata: dict) -> bool:
     
     embedding = generate_embedding(text)
@@ -46,13 +41,6 @@ def search_documents(query: str, top_k: int = 5) -> list[dict]:
     return documents
 
 
-def delete_document(doc_id: str) -> bool:
-
-    _index.delete(ids=[doc_id])
-
-    return True
-
-
 def list_ids_by_filename(filename: str) -> list[str]:
     """
     List all vector IDs that belong to a specific filename.
@@ -71,5 +59,4 @@ def delete_by_ids(ids: list[str]) -> bool:
     if ids:
         _index.delete(ids=ids)
     return True
-
 

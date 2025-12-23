@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers import documents, search
+from app.routers import documents, chat
 
 app = FastAPI(
     title="RAG Docs API",
@@ -8,7 +8,7 @@ app = FastAPI(
 )
 
 app.include_router(documents.router)
-app.include_router(search.router)
+app.include_router(chat.router)
 
 
 @app.get("/")

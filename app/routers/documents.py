@@ -1,6 +1,5 @@
 import os
 import shutil
-from app.schemas import document
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from app.services.document_service import process_document, delete_document_by_filename, UPLOAD_DIR, ALLOWED_EXTENSIONS
 from app.schemas.document import DocumentUploadResponse, DocumentDeleteResponse
