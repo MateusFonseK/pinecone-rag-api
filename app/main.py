@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 from app.routers import documents, chat
 
 app = FastAPI(
@@ -7,8 +7,11 @@ app = FastAPI(
     version="1.0.0"
 )
 
-app.include_router(documents.router)
-app.include_router(chat.router)
+v1 = APIRouter(prefix="/api/v1")
+v1.include_router(documents.router)
+v1.include_router(chat.router)
+
+app.include_router(v1)
 
 
 @app.get("/")

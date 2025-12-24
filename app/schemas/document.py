@@ -17,3 +17,13 @@ class DocumentDeleteResponse(BaseModel):
     message: str
 
 
+class DocumentInfo(BaseModel):
+
+    filename: str
+    size_bytes: int
+
+
+class DocumentListResponse(BaseModel):
+
+    documents: list[DocumentInfo]
+    total: int

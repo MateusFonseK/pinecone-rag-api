@@ -1,8 +1,9 @@
 import os
 import shutil
 from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi.responses import FileResponse
 from app.services.document_service import process_document, delete_document_by_filename, UPLOAD_DIR, ALLOWED_EXTENSIONS
-from app.schemas.document import DocumentUploadResponse, DocumentDeleteResponse
+from app.schemas.document import DocumentUploadResponse, DocumentDeleteResponse, DocumentListResponse, DocumentInfo
 
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
@@ -12,7 +13,7 @@ def _is_allowed_file(filename: str) -> bool:
     return any(filename.lower().endswith(ext) for ext in ALLOWED_EXTENSIONS)
 
 
-@router.post("/upload", response_model=DocumentUploadResponse)
+@router.post("", response_model=DocumentUploadResponse, status_code=201)
 async def upload_document(file: UploadFile = File(...)):
     """
     Upload a document (PDF or DOCX).
@@ -57,30 +58,34 @@ async def upload_document(file: UploadFile = File(...)):
         )
 
 
-@router.get("/list")
+@router.get("", response_model=DocumentListResponse)
 async def list_documents():
     """
     List all uploaded documents.
     """
-    docs = []
     if not os.path.exists(UPLOAD_DIR):
-        return {"documents": [], "total": 0}
+        return DocumentListResponse(documents=[], total=0)
 
-    for f in os.listdir(UPLOAD_DIR):
-        if _is_allowed_file(f):
-            path = os.path.join(UPLOAD_DIR, f)
-            size = os.path.getsize(path)
+    docs = [
+        DocumentInfo(filename=f, size_bytes=os.path.getsize(os.path.join(UPLOAD_DIR, f)))
+        for f in os.listdir(UPLOAD_DIR)
+        if _is_allowed_file(f)
+    ]
 
-            docs.append({
-                "filename": f,
-                "size_bytes": size,
-            })
+    return DocumentListResponse(documents=docs, total=len(docs))
 
 
-    return {
-        "documents": docs,
-        "total": len(docs)
-    }
+@router.get("/{filename}")
+async def get_document(filename: str):
+    """
+    Download a specific document.
+    """
+    file_path = os.path.join(UPLOAD_DIR, filename)
+
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail=f"Document '{filename}' not found")
+
+    return FileResponse(file_path, filename=filename, media_type="application/octet-stream")
 
 
 @router.delete("/{filename}", response_model=DocumentDeleteResponse)
