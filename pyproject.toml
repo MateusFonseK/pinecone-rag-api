@@ -1,7 +1,7 @@
 [project]
-name = "ask-your-docs"
+name = "pinecone-rag-api"
 version = "0.1.0"
-description = "Add your description here"
+description = "A starter API for RAG (Retrieval Augmented Generation) with Pinecone and OpenAI"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
