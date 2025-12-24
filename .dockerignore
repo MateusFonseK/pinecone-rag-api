@@ -1,0 +1,48 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Uploads
+uploads/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Documentation
+*.md
+docs/
+
+# Tests
+tests/
+pytest.ini
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Misc
+.DS_Store
+*.log
