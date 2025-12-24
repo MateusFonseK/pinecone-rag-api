@@ -13,30 +13,40 @@ A production-ready REST API for building RAG (Retrieval Augmented Generation) ap
 ## Requirements
 
 - Python 3.12+
-- [uv](https://docs.astral.sh/uv/)
+- [uv](https://docs.astral.sh/uv/) (for local development)
 - OpenAI API key
 - Pinecone account and index
 
-## Installation
+## Quick Start
 
-### 1. Clone the repository
+### Using Docker (Recommended)
+
+```bash
+# Build the image
+docker build -t pinecone-rag-api .
+
+# Run the container
+docker run -p 8000:8000 --env-file .env pinecone-rag-api
+```
+
+The API will be available at `http://localhost:8000/docs`
+
+### Local Development
+
+#### 1. Clone the repository
 
 ```bash
 git clone https://github.com/your-username/pinecone-rag-api.git
 cd pinecone-rag-api
 ```
 
-### 2. Install dependencies
-
-Using uv (recommended):
+#### 2. Install dependencies
 
 ```bash
 uv sync
 ```
 
-### 3. Configure environment variables
-
-Copy the example file and add your credentials:
+#### 3. Configure environment variables
 
 ```bash
 cp .env.example .env
@@ -51,40 +61,27 @@ OPENAI_MODEL=gpt-4o-mini
 PINECONE_API_KEY=your-pinecone-api-key
 PINECONE_INDEX_NAME=rag-docs
 
-# Optional - Cloudflare R2 (remove to use local storage)
+# Optional - Cloudflare R2 (for cloud storage)
 R2_ACCOUNT_ID=your-account-id
 R2_ACCESS_KEY_ID=your-access-key-id
 R2_SECRET_ACCESS_KEY=your-secret-access-key
 R2_BUCKET_NAME=your-bucket-name
 ```
 
-### 4. Create a Pinecone index
+#### 4. Create a Pinecone index
 
 Create an index in [Pinecone Console](https://app.pinecone.io/) with:
 
 - **Dimensions**: 1536 (for `text-embedding-3-small`)
 - **Metric**: cosine
 
-## Usage
-
-### Start the server
-
-```bash
-./run.sh
-```
-
-Or manually:
+#### 5. Start the server
 
 ```bash
 uv run uvicorn app.main:app --reload
 ```
 
-The API will be available at `http://localhost:8000`
-
-### API Documentation
-
-Interactive docs available at:
-- Swagger UI: `http://localhost:8000/docs`
+The API will be available at `http://localhost:8000/docs`
 
 ## API Reference
 
@@ -183,6 +180,19 @@ The API automatically selects storage mode based on configuration:
 - **[python-docx](https://python-docx.readthedocs.io/)** - DOCX processing
 - **[boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html)** - Cloudflare R2 (S3-compatible)
 
+## Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `OPENAI_API_KEY` | Yes | OpenAI API key for embeddings and chat |
+| `OPENAI_MODEL` | Yes | Model for chat completions |
+| `PINECONE_API_KEY` | Yes | Pinecone API key |
+| `PINECONE_INDEX_NAME` | Yes | Name of your Pinecone index |
+| `R2_ACCOUNT_ID` | No | Cloudflare account ID (for R2 storage) |
+| `R2_ACCESS_KEY_ID` | No | R2 access key ID |
+| `R2_SECRET_ACCESS_KEY` | No | R2 secret access key |
+| `R2_BUCKET_NAME` | No | R2 bucket name |
+
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE) for details.
