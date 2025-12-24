@@ -9,20 +9,17 @@ _index = _client.Index(settings.pinecone_index_name)
 
 
 def upsert_document(doc_id: str, text: str, metadata: dict) -> bool:
-    
+    """Insert or update a document vector in Pinecone."""
     embedding = generate_embedding(text)
-    
     metadata["text"] = text
-
     _index.upsert(vectors=[(doc_id, embedding, metadata)])
-
     return True
 
 
 def search_documents(query: str, top_k: int = 5) -> list[dict]:
-    
+    """Search for similar documents using semantic search."""
     query_embedding = generate_embedding(query)
-    
+
     results = _index.query(
         vector=query_embedding,
         top_k=top_k,

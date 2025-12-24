@@ -11,12 +11,12 @@ ALLOWED_EXTENSIONS = {".pdf", ".docx", ".txt", ".md"}
 
 
 def _generate_doc_id(filename: str) -> str:
-
+    """Generate a unique document ID from filename."""
     return hashlib.md5(filename.encode()).hexdigest()
 
 
 def _extract_text_from_pdf(file_path: str) -> str:
-
+    """Extract text from a PDF file."""
     reader = PdfReader(file_path)
     text = ""
 
@@ -27,7 +27,7 @@ def _extract_text_from_pdf(file_path: str) -> str:
 
 
 def _extract_text_from_docx(file_path: str) -> str:
-
+    """Extract text from a DOCX file."""
     doc = Document(file_path)
     text = ""
 
@@ -38,13 +38,13 @@ def _extract_text_from_docx(file_path: str) -> str:
 
 
 def _extract_text_from_txt(file_path: str) -> str:
-
+    """Extract text from a TXT or MD file."""
     with open(file_path, "r", encoding="utf-8") as f:
         return f.read()
 
 
 def _extract_text(file_path: str) -> str:
-
+    """Extract text from a file based on its extension."""
     lower_path = file_path.lower()
 
     if lower_path.endswith(".pdf"):
@@ -58,12 +58,11 @@ def _extract_text(file_path: str) -> str:
 
 
 def _split_into_chunks(text: str, chunk_size: int = 500, overlap: int = 50) -> list[str]:
-
+    """Split text into overlapping chunks."""
     chunks = []
     start = 0
 
     while start < len(text):
-
         end = start + chunk_size
         chunk = text[start:end]
 
@@ -76,14 +75,13 @@ def _split_into_chunks(text: str, chunk_size: int = 500, overlap: int = 50) -> l
 
 
 def process_document(filename: str, file_path: str) -> int:
-
+    """Process a document: extract text, chunk it, and store in Pinecone."""
     text = _extract_text(file_path)
 
     if not text.strip():
         raise ValueError("Could not extract text from document")
 
     chunks = _split_into_chunks(text)
-
     base_id = _generate_doc_id(filename)
 
     for i, chunk in enumerate(chunks):
@@ -99,7 +97,7 @@ def process_document(filename: str, file_path: str) -> int:
 
 
 def delete_document_by_filename(filename: str) -> int:
-
+    """Delete all chunks of a document from Pinecone."""
     base_id = _generate_doc_id(filename)
     ids = list_ids_by_filename(base_id)
 
