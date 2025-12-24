@@ -7,7 +7,7 @@ from app.services.pinecone_service import upsert_document, list_ids_by_filename,
 # Directory where uploaded files are stored
 UPLOAD_DIR = "uploads"
 
-ALLOWED_EXTENSIONS = {".pdf", ".docx"}
+ALLOWED_EXTENSIONS = {".pdf", ".docx", ".txt", ".md"}
 
 
 def _generate_doc_id(filename: str) -> str:
@@ -37,12 +37,22 @@ def _extract_text_from_docx(file_path: str) -> str:
     return text
 
 
+def _extract_text_from_txt(file_path: str) -> str:
+
+    with open(file_path, "r", encoding="utf-8") as f:
+        return f.read()
+
+
 def _extract_text(file_path: str) -> str:
 
-    if file_path.lower().endswith(".pdf"):
+    lower_path = file_path.lower()
+
+    if lower_path.endswith(".pdf"):
         return _extract_text_from_pdf(file_path)
-    elif file_path.lower().endswith(".docx"):
+    elif lower_path.endswith(".docx"):
         return _extract_text_from_docx(file_path)
+    elif lower_path.endswith(".txt") or lower_path.endswith(".md"):
+        return _extract_text_from_txt(file_path)
     else:
         raise ValueError(f"Unsupported file format. Allowed: {ALLOWED_EXTENSIONS}")
 
